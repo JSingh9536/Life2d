@@ -9,26 +9,30 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.KeyHandler;
-
+//Defines a class named Player that inherits properties and methods from a class named Entity
 public class Player extends Entity{
 	GamePanel gp;
 	KeyHandler keyH;
-	
+
+	// Initializes a Player object with references to a GamePanel and KeyHandler	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		this.gp = gp;
 		this.keyH = keyH;
-		setDefaultValue();
-		getPlayerImage();
+		setDefaultValue(); // Sets default values for player attributes
+		getPlayerImage(); // Loads player sprites
 	}
+	// Sets initial values for player attributes
 	public void setDefaultValue() {
-		x = 100;
-		y = 100;
-		speed = 4;
-		direction = "down";
+		x = 100; // Initial x-coordinate
+		y = 100; // Initial y-coordinate
+		speed = 4; // Player's movement speed
+		direction = "down"; // Initial facing direction
 		
 	}
+	// Loads player sprite images from files
 	public void getPlayerImage() {
 		try {
+	        // Loads various sprite images for different directions and animation frames
 			up0 = ImageIO.read(getClass().getResourceAsStream("/player/usprite_0.png"));
 			up1 = ImageIO.read(getClass().getResourceAsStream("/player/usprite_1.png"));
 			up2 = ImageIO.read(getClass().getResourceAsStream("/player/usprite_2.png"));
@@ -44,10 +48,12 @@ public class Player extends Entity{
 
 
 			
-		}catch(IOException e) {
+		}catch(IOException e) {        // Prints error message if image loading fails
 			e.printStackTrace();
 		}
 	}
+	// Updates the player's position and animation based on key presses
+
 	public void update() {
 		if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {
 		if(keyH.upPressed == true) {
@@ -67,6 +73,8 @@ public class Player extends Entity{
 			direction = "right";
 			x += speed;
 		}
+        // Updates animation frame
+
 		spriteCounter++;
 		if(spriteCounter > 12) {
 			if(spriteNum == 1 ) {
@@ -81,9 +89,10 @@ public class Player extends Entity{
 	
 	}
 	}
+	// Draws the player's sprite image on the screen
 	public void draw(Graphics2D g2) {
 		BufferedImage image = null;
-		switch(direction) {
+		switch(direction) {     // Selects the appropriate sprite image based on direction and animation frame
 		case "up":
 			if(spriteNum == 0) {
 			image = up0;
@@ -130,6 +139,8 @@ public class Player extends Entity{
 			break;
 			
 		}
+	    // Draws the selected image at the player's current position
+	    // using tileSize as a guide for dimensions
 		g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
 
 	}

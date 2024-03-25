@@ -8,7 +8,8 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import entity.Player;
-
+//Defines a class(for visual components)
+//and implements Runnable (for game loop functionality)
 public class GamePanel extends JPanel implements Runnable{
 //Determines pixel size and screen size
 	final int originalTitleSize = 16;
@@ -20,66 +21,62 @@ public class GamePanel extends JPanel implements Runnable{
 	final int screenWidth = tileSize * maxScreenCol;
 	final int screenHeight = tileSize * maxScreenRow;
 	
-	//fps
+	// Frames per second (FPS) for game updates
 	int FPS = 60;
-	//input
+	// KeyHandler object for handling user input
 	KeyHandler keyH = new KeyHandler();
 	
-	//game clock and animation clock
+	// Thread for running the game loop
 	Thread gameThread;
+	// Player object
 	Player player = new Player(this,keyH);
-	//player position
-	int playerX = 100;
-	int playerY = 100;
-	int playerSpeed = 4;
+	// Initializes the GamePanel object with appropriate settings
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
 		this.setBackground(Color.black);
-		this.setDoubleBuffered(true);
-		this.addKeyListener(keyH);
-		this.setFocusable(true);
+		this.setDoubleBuffered(true); // Enables double buffering for smoother rendering
+		this.addKeyListener(keyH); // Adds the KeyHandler for listening to key presses
+		this.setFocusable(true); // Allows the panel to receive keyboard input
 	}
+	// Starts the game thread
 	public void startGameThread() {
-		gameThread = new Thread(this);
-		gameThread.start();
+		gameThread = new Thread(this); // Creates a thread using this GamePanel object
+		gameThread.start(); // Starts the thread
 	}
-
+	// Main game loop method (executed by the game thread)
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		double drawInterval = 1000000000/FPS; //0.01666 seconds
-		double nextDrawTime = System.nanoTime() + drawInterval;
-		while(gameThread != null) {
-	
-		
-		//Updates character location
-		update();
-		// Draws the screen 
-		repaint();
-		
+		double drawInterval = 1000000000/FPS; //0.01666 seconds; Calculates time interval for each frame
+		double nextDrawTime = System.nanoTime() + drawInterval; // Sets initial time for the next frame
+		while(gameThread != null) { // Loops continuously until the game thread is stopped
+		update(); // Updates game elements
+		repaint();// Repaints the screen to reflect changes
+		// Controls frame rate
 		try {
 			double remainingTime = nextDrawTime - System.nanoTime();
-			remainingTime = remainingTime/1000000;
+			remainingTime = remainingTime/1000000; // Converts remaining time to milliseconds
 			if(remainingTime < 0) {
 				remainingTime = 0;
 			}
-			Thread.sleep((long) remainingTime);
-			
-			nextDrawTime += drawInterval;
+			Thread.sleep((long) remainingTime); // Pauses the thread to maintain desired FPS
+			nextDrawTime += drawInterval; // Updates next frame time
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		}
 	}
+	// Updates game elements (currently only updates the player)
 	public void update() {
 		player.update();
 	
 	}
+	// Draws game elements on the screen
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D)g;
-		player.draw(g2);
-		g2.dispose();
+		super.paintComponent(g); // Calls the parent class's paintComponent method
+		Graphics2D g2 = (Graphics2D)g; // Casts Graphics object to Graphics2D for advanced features
+		player.draw(g2); // Draws the player on the screen
+		g2.dispose(); // Disposes of graphics resources
 	}
 }
