@@ -10,19 +10,23 @@ import javax.swing.JPanel;
 import entity.Player;
 //Defines a class(for visual components)
 //and implements Runnable (for game loop functionality)
+import tile.Tile;
+import tile.TileManager;
 public class GamePanel extends JPanel implements Runnable{
 //Determines pixel size and screen size
 	final int originalTitleSize = 16;
 	final int scale = 3;
 	
 	public final int tileSize = originalTitleSize * scale;
-	final int maxScreenCol = 16;
-	final int maxScreenRow = 12;
-	final int screenWidth = tileSize * maxScreenCol;
-	final int screenHeight = tileSize * maxScreenRow;
+	public final int maxScreenCol = 16;
+	public final int maxScreenRow = 12;
+	public final int screenWidth = tileSize * maxScreenCol;
+	public final int screenHeight = tileSize * maxScreenRow;
 	
 	// Frames per second (FPS) for game updates
 	int FPS = 60;
+	
+	TileManager tileM = new TileManager(this);
 	// KeyHandler object for handling user input
 	KeyHandler keyH = new KeyHandler();
 	
@@ -76,6 +80,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g); // Calls the parent class's paintComponent method
 		Graphics2D g2 = (Graphics2D)g; // Casts Graphics object to Graphics2D for advanced features
+		tileM.draw(g2); //Draws map tile
 		player.draw(g2); // Draws the player on the screen
 		g2.dispose(); // Disposes of graphics resources
 	}
