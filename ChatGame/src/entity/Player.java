@@ -3,7 +3,10 @@ package entity;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +16,9 @@ import main.KeyHandler;
 public class Player extends Entity{
 	GamePanel gp;
 	KeyHandler keyH;
+	
+	private Socket client;
+	private int playerID;
 
 	// Initializes a Player object with references to a GamePanel and KeyHandler	
 	public Player(GamePanel gp, KeyHandler keyH) {
@@ -143,5 +149,53 @@ public class Player extends Entity{
 	    // using tileSize as a guide for dimensions
 		g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
 
+	}
+	
+	private void connectToServer(String ip, String name) {
+		try {
+			client = new Socket("localhost", 7272);
+			DataInputStream in = new DataInputStream(client.getInputStream());
+			DataOutputStream out = new DataOutputStream(client.getOutputStream());
+			serverHandler sh = new serverHandler(in, out);
+		}catch (IOException ioe) {
+			//shutdown
+		}
+	}
+	
+	private class serverHandler implements Runnable{ //acts like clientHandler; sends info to server and reads from server
+		private DataInputStream dataIn;
+		private DataOutputStream dataOut;
+		
+		public serverHandler(DataInputStream in, DataOutputStream out) {
+			dataIn = in;
+			dataOut = out;
+		}
+
+		@Override
+		public void run() {
+			try {
+				while(true) {
+					WriteToServer();
+					ReadFromServer();
+					Thread.sleep(25);
+				}
+			}catch(Exception io) {
+				//idk
+			}
+		}
+		
+		private void WriteToServer() {//PUTTING HERE CUZ FUCK YOU***: WHY NOT SEND PID & THE X/Y SO THAT THE SERVER KNOWS WHO TO CHANGE
+			try {
+				//dataOut.writeInt(getPID()) ***Send over the pid to the server to figure out who sent/ who to change on server side
+				dataOut.writeInt(getX());
+				dataOut.writeInt(getY()); 
+				dataOut.flush();
+			}catch(IOException ioe){
+				//you can catch my balls
+			}
+		}
+		private void ReadFromServer() {
+			
+		}
 	}
 }
