@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -153,7 +154,7 @@ public class Player extends Entity{
 	
 	private void connectToServer(String ip, String name) {
 		try {
-			client = new Socket("localhost", 7272);
+			client = new Socket("localhost", 5252);
 			DataInputStream in = new DataInputStream(client.getInputStream());
 			DataOutputStream out = new DataOutputStream(client.getOutputStream());
 			serverHandler sh = new serverHandler(in, out);
@@ -165,10 +166,12 @@ public class Player extends Entity{
 	private class serverHandler implements Runnable{ //acts like clientHandler; sends info to server and reads from server
 		private DataInputStream dataIn;
 		private DataOutputStream dataOut;
+		public ArrayList<ClientToServer> otherPlayerInfo;
 		
 		public serverHandler(DataInputStream in, DataOutputStream out) {
 			dataIn = in;
 			dataOut = out;
+			otherPlayerInfo = new ArrayList<>();
 		}
 
 		@Override
@@ -184,9 +187,8 @@ public class Player extends Entity{
 			}
 		}
 		
-		private void WriteToServer() {//PUTTING HERE CUZ FUCK YOU***: WHY NOT SEND PID & THE X/Y SO THAT THE SERVER KNOWS WHO TO CHANGE
+		private void WriteToServer() {
 			try {
-				//dataOut.writeInt(getPID()) ***Send over the pid to the server to figure out who sent/ who to change on server side
 				dataOut.writeInt(getX());
 				dataOut.writeInt(getY()); 
 				dataOut.flush();
@@ -194,8 +196,14 @@ public class Player extends Entity{
 				//you can catch my balls
 			}
 		}
-		private void ReadFromServer() {
-			
+		private void ReadFromServer() {//TODO-FOR LUKE: THIS WHOLE METHOD
+			try {
+				//NEED TO CHECK IF PID IS IN THIS PLAYER'S LIST
+				//AND IF NOT ADD IT AS WELL AS ADD IT IF THERE ARE 
+				//NO PLAYERS IN LIST AND WE GET A PID FOR THE FIRST TIME
+			}catch(Exception e) {
+				//something
+			}
 		}
 	}
 }
