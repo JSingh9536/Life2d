@@ -152,12 +152,19 @@ public class Player extends Entity{
 
 	}
 	
+	//TODO: UPDATE THE PLAYERS ON OUR END WITH THE INFO WE HAVE STORED
+	//OTHER PLAYER INFO STORED IN 'otherPlayerInfo'
+	//JUST USE .getX OR .getY TO SET PLAYER SPRITES ON OUR END TO THAT COORDINATE
+	
+	//WE PROBABLY NEED ANOTHER THREAD TO MANAGE THE IDEA ABOVE^^^
+	
 	private void connectToServer(String ip, String name) {
 		try {
 			client = new Socket("localhost", 5252);
 			DataInputStream in = new DataInputStream(client.getInputStream());
 			DataOutputStream out = new DataOutputStream(client.getOutputStream());
 			serverHandler sh = new serverHandler(in, out);
+			//TODO:ADD THREADS AND MAKE THREAD START 'sh' HERE
 		}catch (IOException ioe) {
 			//shutdown
 		}
@@ -167,6 +174,10 @@ public class Player extends Entity{
 		private DataInputStream dataIn;
 		private DataOutputStream dataOut;
 		public ArrayList<ClientToServer> otherPlayerInfo;
+		public boolean inList = false;
+		public int otherPID;
+		public int storedX;
+		public int storedY;
 		
 		public serverHandler(DataInputStream in, DataOutputStream out) {
 			dataIn = in;
@@ -196,11 +207,26 @@ public class Player extends Entity{
 				//you can catch my balls
 			}
 		}
-		private void ReadFromServer() {//TODO-FOR LUKE: THIS WHOLE METHOD
+		private void ReadFromServer() {
 			try {
-				//NEED TO CHECK IF PID IS IN THIS PLAYER'S LIST
-				//AND IF NOT ADD IT AS WELL AS ADD IT IF THERE ARE 
-				//NO PLAYERS IN LIST AND WE GET A PID FOR THE FIRST TIME
+				inList = false;
+				otherPID = dataIn.readInt();
+				storedX = dataIn.readInt();
+				storedY = dataIn.readInt();
+				if(otherPlayerInfo == null) {//if list is empty and we read in data then make a new player in list
+					otherPlayerInfo.add(new ClientToServer(otherPID, storedX, storedY)); //add new player to info list
+				}else {
+					for(ClientToServer i : otherPlayerInfo) {
+						if(i.getPID() == otherPID) {
+							i.setX(storedX);
+							i.setY(storedY);
+							inList = true;
+						}
+					}
+					if(inList == false) {//if player is not in the list, then add them to it
+						otherPlayerInfo.add(new ClientToServer(otherPID, storedX, storedY));
+					}
+				}
 			}catch(Exception e) {
 				//something
 			}
