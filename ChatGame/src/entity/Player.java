@@ -221,7 +221,7 @@ public class Player extends Entity implements Runnable{
 							}
 						}
 					}
-					Thread.sleep(25);
+					Thread.sleep(5);
 				}catch(Exception e) {
 					//something
 				}
@@ -243,7 +243,7 @@ public class Player extends Entity implements Runnable{
 					dataOut.writeInt(getX());
 					dataOut.writeInt(getY());
 					dataOut.flush();
-					Thread.sleep(25);
+					Thread.sleep(5);
 				}catch(Exception e){
 					//you can catch my balls
 				}
