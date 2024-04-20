@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
 //Defines a class named Player that inherits properties and methods from a class named Entity
-public class Player extends Entity{
+public class Player extends Entity implements Runnable{
 	GamePanel gp;
 	KeyHandler keyH;
 	
@@ -151,7 +151,10 @@ public class Player extends Entity{
 		}
 	    // Draws the selected image at the player's current position
 	    // using tileSize as a guide for dimensions
+
 		g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
+
+	
 		
 		//Luke - I'm gonna make it draw the other player's here as well
 		//we can work on those player animations later.
@@ -228,6 +231,7 @@ public class Player extends Entity{
 			}
 		}
 	}
+
 	private class WriteToServerHandler implements Runnable{
 		DataOutputStream dataOut;
 		
