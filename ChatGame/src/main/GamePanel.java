@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import entity.Player;
@@ -13,7 +14,14 @@ import entity.Player;
 import tile.Tile;
 import tile.TileManager;
 public class GamePanel extends JPanel implements Runnable{
-//Determines pixel size and screen size
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7948366756305049733L;
+/**
+	 * 
+	 */
+	//Determines pixel size and screen size
 	final int originalTitleSize = 16;
 	final int scale = 3;
 	
@@ -33,7 +41,7 @@ public class GamePanel extends JPanel implements Runnable{
 	// Thread for running the game loop
 	Thread gameThread;
 	// Player object
-	Player player = new Player(this,keyH);
+	Player player = new Player(this, keyH);
 	// Initializes the GamePanel object with appropriate settings
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));

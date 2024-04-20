@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -17,8 +18,10 @@ public class Player extends Entity{
 	GamePanel gp;
 	KeyHandler keyH;
 	
+	//Vars for Network-Connection
 	private Socket client;
 	private int playerID;
+	public ArrayList<ClientToServer> otherPlayerInfo;
 
 	// Initializes a Player object with references to a GamePanel and KeyHandler	
 	public Player(GamePanel gp, KeyHandler keyH) {
@@ -26,11 +29,12 @@ public class Player extends Entity{
 		this.keyH = keyH;
 		setDefaultValue(); // Sets default values for player attributes
 		getPlayerImage(); // Loads player sprites
+		run();
 	}
 	// Sets initial values for player attributes
 	public void setDefaultValue() {
-		x = 100; // Initial x-coordinate
-		y = 100; // Initial y-coordinate
+		worldX = 100; // Initial x-coordinate
+		worldY = 100; // Initial y-coordinate
 		speed = 4; // Player's movement speed
 		direction = "down"; // Initial facing direction
 		
@@ -64,20 +68,20 @@ public class Player extends Entity{
 		if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {
 		if(keyH.upPressed == true) {
 			direction = "up";
-			y -= speed;
+			worldY -= speed;
 			
 		}
 		else if(keyH.downPressed == true) {
 			direction = "down";
-			y += speed;
+			worldY += speed;
 		}
 		else if(keyH.leftPressed == true) {
 			direction = "left";
-			x -= speed;
+			worldX -= speed;
 		}
 		else if(keyH.rightPressed == true) {
 			direction = "right";
-			x += speed;
+			worldX += speed;
 		}
         // Updates animation frame
 
@@ -147,55 +151,102 @@ public class Player extends Entity{
 		}
 	    // Draws the selected image at the player's current position
 	    // using tileSize as a guide for dimensions
-		g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
-
+		g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
+		
+		//Luke - I'm gonna make it draw the other player's here as well
+		//we can work on those player animations later.
+		if(otherPlayerInfo != null) { //if other players are connected
+			for(ClientToServer i : otherPlayerInfo) {
+				g2.drawImage(down0, i.getX(), i.getY(), gp.tileSize, gp.tileSize, null); //draw other players based on their x/y
+			}
+		}
 	}
 	
-	private void connectToServer(String ip, String name) {
+	public void run() {
+		connectToServer("localhost");
+	}
+	
+	//TODO: MAKE THE serverHandler TWO THREADS FOR READING AND WRITING
+	//MAKE A readFromServer CLASS AND RUN THAT THREAD IN connectToServer
+	//THEN MAKE A writeToServer CLASS AND RUN THAT THREAD IN connectToServer as well
+	
+	private void connectToServer(String ip) { //used to have 'name' arg; might implement later
 		try {
-			client = new Socket("localhost", 7272);
+			client = new Socket(ip, 5252);
 			DataInputStream in = new DataInputStream(client.getInputStream());
 			DataOutputStream out = new DataOutputStream(client.getOutputStream());
-			serverHandler sh = new serverHandler(in, out);
+			ReadFromServerHandler rfs = new ReadFromServerHandler(in);
+			WriteToServerHandler wts = new WriteToServerHandler(out);
+			Thread wtsThread = new Thread(wts);
+			Thread rfsThread = new Thread(rfs);
+			wtsThread.start();
+			rfsThread.start();
 		}catch (IOException ioe) {
 			//shutdown
 		}
 	}
 	
-	private class serverHandler implements Runnable{ //acts like clientHandler; sends info to server and reads from server
-		private DataInputStream dataIn;
-		private DataOutputStream dataOut;
+	private class ReadFromServerHandler implements Runnable{
+		public DataInputStream dataIn;
+		public boolean inList = false;
+		public int otherPID;
+		public int storedX;
+		public int storedY;
 		
-		public serverHandler(DataInputStream in, DataOutputStream out) {
+		public ReadFromServerHandler(DataInputStream in) {
 			dataIn = in;
+			otherPlayerInfo = new ArrayList<>();
+		}
+		
+		public void run() {
+			while(true) {
+				try {
+					inList = false;
+					otherPID = dataIn.readInt();
+					storedX = dataIn.readInt();
+					storedY = dataIn.readInt();
+					if(otherPID != -100) {//this is an error response so that the 1st person to join does not deadlock with server
+						if(otherPlayerInfo == null) {//if list is empty and we read in data then make a new player in list
+							otherPlayerInfo.add(new ClientToServer(otherPID, storedX, storedY)); //add new player to info list
+						}else {
+							for(ClientToServer i : otherPlayerInfo) {
+								if(i.getPID() == otherPID) {
+									i.setX(storedX);
+									i.setY(storedY);
+									inList = true;
+								}
+							}
+							if(inList == false) {//if player is not in the list, then add them to it
+								otherPlayerInfo.add(new ClientToServer(otherPID, storedX, storedY));
+							}
+						}
+					}
+					Thread.sleep(5);
+				}catch(Exception e) {
+					//something
+				}
+			}
+		}
+	}
+	private class WriteToServerHandler implements Runnable{
+		DataOutputStream dataOut;
+		
+		public WriteToServerHandler(DataOutputStream out) {
 			dataOut = out;
 		}
-
-		@Override
-		public void run() {
-			try {
-				while(true) {
-					WriteToServer();
-					ReadFromServer();
-					Thread.sleep(25);
-				}
-			}catch(Exception io) {
-				//idk
-			}
-		}
 		
-		private void WriteToServer() {//PUTTING HERE CUZ FUCK YOU***: WHY NOT SEND PID & THE X/Y SO THAT THE SERVER KNOWS WHO TO CHANGE
-			try {
-				//dataOut.writeInt(getPID()) ***Send over the pid to the server to figure out who sent/ who to change on server side
-				dataOut.writeInt(getX());
-				dataOut.writeInt(getY()); 
-				dataOut.flush();
-			}catch(IOException ioe){
-				//you can catch my balls
+		public void run() {
+			while(true) {
+				try {
+					System.out.println("Sending X:" + getX() + " and Y:" + getY());
+					dataOut.writeInt(getX());
+					dataOut.writeInt(getY());
+					dataOut.flush();
+					Thread.sleep(5);
+				}catch(Exception e){
+					//you can catch my balls
+				}
 			}
-		}
-		private void ReadFromServer() {
-			
 		}
 	}
 }

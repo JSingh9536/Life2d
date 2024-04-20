@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 //Defines a class named Entity that serves as a base class for representing objects in a game
 
 public class Entity {
-	public int x, y; // Coordinates for the entity's position
+	public int worldX, worldY; // Coordinates for the entity's position
 	public int speed;	// Movement speed of the entity
 	// BufferedImage objects to store sprite images for different directions and animation frames
 	public BufferedImage up0, up1, up2, down0, down1, down2, left0, left1, left2, right0, right1, right2;
@@ -16,16 +16,16 @@ public class Entity {
 	
 	//~~~~~~~~~~~~Changes:
 	public int getX() {
-		return x;
+		return worldX;
 	}
 	public int getY() {
-		return y;
+		return worldY;
 	}
 	public void setX(int n) {
-		x = n;
+		worldX = n;
 	}
 	public void setY(int n) {
-		y = n;
+		worldY = n;
 	}
 	public int getPID() { //WE CAN USE THIS TO SEE THE PIDs OF OTHER PALYERS ON OUR END AND CHANGE THEIR POSITION
 		return playerID;
