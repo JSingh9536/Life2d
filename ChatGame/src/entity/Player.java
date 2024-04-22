@@ -3,9 +3,16 @@ package entity;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -166,29 +173,143 @@ public class Player extends Entity implements Runnable{
 	}
 	
 	public void run() {
-		connectToServer("localhost");
+		//connectToServerTCP("localhost");
+		connectToServerUDP();
 	}
-	
-	//TODO: MAKE THE serverHandler TWO THREADS FOR READING AND WRITING
-	//MAKE A readFromServer CLASS AND RUN THAT THREAD IN connectToServer
-	//THEN MAKE A writeToServer CLASS AND RUN THAT THREAD IN connectToServer as well
-	
-	private void connectToServer(String ip) { //used to have 'name' arg; might implement later
+	//TCP Version:
+	private void connectToServerTCP(String ip) { //used to have 'name' arg; might implement later
 		try {
-			client = new Socket(ip, 5252);
-			DataInputStream in = new DataInputStream(client.getInputStream());
-			DataOutputStream out = new DataOutputStream(client.getOutputStream());
-			ReadFromServerHandler rfs = new ReadFromServerHandler(in);
-			WriteToServerHandler wts = new WriteToServerHandler(out);
-			Thread wtsThread = new Thread(wts);
-			Thread rfsThread = new Thread(rfs);
-			wtsThread.start();
-			rfsThread.start();
-		}catch (IOException ioe) {
-			//shutdown
+				client = new Socket(ip, 5252);
+				DataInputStream in = new DataInputStream(client.getInputStream());
+				DataOutputStream out = new DataOutputStream(client.getOutputStream());
+				ReadFromServerHandler rfs = new ReadFromServerHandler(in);
+				WriteToServerHandler wts = new WriteToServerHandler(out);
+				Thread wtsThread = new Thread(wts);
+				Thread rfsThread = new Thread(rfs);
+				wtsThread.start();
+				rfsThread.start();
+			}catch (IOException ioe) {
+				//shutdown
+			}
+	}
+	//UDP Version
+	private void connectToServerUDP() {//used to have arg InetAddress serverIP
+		playerID = (int)(Math.random()* 1000) + 111;
+		ReadFromServerHandlerUDP rfsU = new ReadFromServerHandlerUDP(); //had serverIP arg
+		WriteToServerHandlerUDP wtsU = new WriteToServerHandlerUDP(); //had serverIP arg
+		Thread wtsThreadUDP = new Thread(wtsU);
+		Thread rfsThreadUDP = new Thread(rfsU);
+		wtsThreadUDP.start();
+		rfsThreadUDP.start();
+	} 
+	private class ReadFromServerHandlerUDP implements Runnable{
+		private DatagramSocket readSocket;
+		private InetAddress ipAddress;
+		public ClientToServer readPlayerInfo;
+		public DatagramPacket readPacket;
+		public byte[] readBuffer;
+		public ByteArrayInputStream byteInput;
+		public ObjectInputStream in;
+		public boolean inList = false;
+		public int bufLen;
+		
+		public ReadFromServerHandlerUDP() { //had InetAddress ip arg
+			try {
+				readSocket = new DatagramSocket(6262);
+				//ipAddress = ip;
+				ipAddress = InetAddress.getByName("localhost");
+				readBuffer = new byte[1400];
+				bufLen = readBuffer.length;
+			} catch(Exception e) {
+				//something
+			}
+		}
+		public void run() {
+			while(true) {
+				try {
+					readPacket = new DatagramPacket(readBuffer, bufLen);//hopefully pulls in the correct length
+					readSocket.receive(readPacket);
+					bufLen = readPacket.getLength();
+					byteInput = new ByteArrayInputStream(readBuffer);
+					in = new ObjectInputStream(byteInput);
+					readPlayerInfo = (ClientToServer)in.readObject();
+					System.out.println("PID: " + readPlayerInfo.getPID() + ", X: " + readPlayerInfo.getX() + ", Y: " + readPlayerInfo.getY());
+					//THE WRITE BUFFER IS BROKEN BECAUSE BOTH PLAYERS ONLY RECEIVE 1 PID
+					assignInfo();
+					Thread.sleep(25);
+				} catch(Exception e) {
+					//something
+				}
+			}
+		}
+		public void assignInfo() {
+			inList = false;
+			if(readPlayerInfo.getPID() != playerID) {
+				if(otherPlayerInfo == null) {//if list is empty and we read in data then make a new player in list
+					otherPlayerInfo.add(new ClientToServer(readPlayerInfo.getPID(), readPlayerInfo.getX(), readPlayerInfo.getY())); //add new player to info list
+					System.out.println("Player: Just added the new player to the list!");
+				}else {
+					for(ClientToServer i : otherPlayerInfo) {
+						if(i.getPID() == readPlayerInfo.getPID()) {
+							i.setX(readPlayerInfo.getX());
+							i.setY(readPlayerInfo.getY());
+							inList = true;
+						}
+					}
+					if(inList == false) {//if player is not in the list, then add them to it
+						otherPlayerInfo.add(new ClientToServer(readPlayerInfo.getPID(), readPlayerInfo.getX(), readPlayerInfo.getY()));
+						System.out.println("Player: Just added the new player to the list!");
+					}
+				}
+			}
 		}
 	}
-	
+	private class WriteToServerHandlerUDP implements Runnable{
+		private DatagramSocket writeSocket;
+		private InetAddress address;
+		private ClientToServer infoObject;
+		public DatagramPacket sPacket;
+		public ObjectOutputStream out;
+		public ByteArrayOutputStream buffer;
+			
+		public WriteToServerHandlerUDP(){ //had InetAddress ip arg
+			try {
+				writeSocket = new DatagramSocket();
+				//address = ip;
+				address = InetAddress.getByName("localhost");
+				infoObject = new ClientToServer(playerID, getX(), getY());
+				buffer = new ByteArrayOutputStream();
+				out = new ObjectOutputStream(buffer);
+				
+			} catch(Exception e) {
+				//nothing
+			}
+			
+		}
+		public void run(){
+			while(true){
+				try {
+					infoObject.setX(getX());
+					infoObject.setY(getY());
+					//System.out.println("Sending: PID: " + infoObject.getPID() + ", X: " + infoObject.getX() + ", Y: " + infoObject.getY());
+					//WE SEND CORRECT INFO BUT RECEIVED INFO IS STUCK AT X:100 Y:100
+					out.writeObject(infoObject);
+					sPacket = new DatagramPacket(buffer.toByteArray(), buffer.size(), address, 5252);
+					writeSocket.send(sPacket);
+					//System.out.println("Just sent a packet to:" + address);
+					out.flush();
+					buffer.flush();//guessing we'll need to do it
+					Thread.sleep(25);
+				} catch(Exception e) {
+					//something
+				}
+				
+			}
+			//out.close(); close these two somewhere
+			//buffer.close();
+		}
+	}
+	//TCP VERSIONS:
 	private class ReadFromServerHandler implements Runnable{
 		public DataInputStream dataIn;
 		public boolean inList = false;
@@ -214,6 +335,7 @@ public class Player extends Entity implements Runnable{
 						}else {
 							for(ClientToServer i : otherPlayerInfo) {
 								if(i.getPID() == otherPID) {
+									System.out.println("Other Player's X:" + storedX + ", Y:" + storedY);
 									i.setX(storedX);
 									i.setY(storedY);
 									inList = true;
@@ -224,14 +346,13 @@ public class Player extends Entity implements Runnable{
 							}
 						}
 					}
-					Thread.sleep(5);
+					Thread.sleep(25);
 				}catch(Exception e) {
 					//something
 				}
 			}
 		}
 	}
-
 	private class WriteToServerHandler implements Runnable{
 		DataOutputStream dataOut;
 		
@@ -242,11 +363,10 @@ public class Player extends Entity implements Runnable{
 		public void run() {
 			while(true) {
 				try {
-					System.out.println("Sending X:" + getX() + " and Y:" + getY());
 					dataOut.writeInt(getX());
 					dataOut.writeInt(getY());
 					dataOut.flush();
-					Thread.sleep(5);
+					Thread.sleep(25);
 				}catch(Exception e){
 					//you can catch my balls
 				}
