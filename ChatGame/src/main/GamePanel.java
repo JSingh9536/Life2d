@@ -2,17 +2,25 @@ package main;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
+//<<<<<<< HEAD
+import javax.swing.JButton;
+//=======
 import javax.swing.JOptionPane;
+//>>>>>>> branch 'main' of https://github.com/JSingh9536/Life2d.git
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 
 import entity.Player;
 //Defines a class(for visual components)
 //and implements Runnable (for game loop functionality)
 import tile.Tile;
 import tile.TileManager;
+import main.MainMenu;
 public class GamePanel extends JPanel implements Runnable{
 /**
 	 * 
@@ -24,19 +32,29 @@ public class GamePanel extends JPanel implements Runnable{
 	//Determines pixel size and screen size
 	final int originalTitleSize = 16;
 	final int scale = 3;
-	
+	private JTextField uName;
+
 	public final int tileSize = originalTitleSize * scale;
 	public final int maxScreenCol = 16;
 	public final int maxScreenRow = 12;
 	public final int screenWidth = tileSize * maxScreenCol;
 	public final int screenHeight = tileSize * maxScreenRow;
 	
+	//game States
+	public final int titleState = 0;
+	public int gameState = 0;
+	public final int playState=1;
+	
 	// Frames per second (FPS) for game updates
 	int FPS = 60;
+
+	//object for Main menu screen
+ 	MainMenu mainMenu = new MainMenu(this);
+
 	
-	TileManager tileM = new TileManager(this);
+ 	TileManager tileM = new TileManager(this);
 	// KeyHandler object for handling user input
-	KeyHandler keyH = new KeyHandler();
+	KeyHandler keyH = new KeyHandler(this, mainMenu);
 	
 	// Thread for running the game loop
 	Thread gameThread;
@@ -49,6 +67,7 @@ public class GamePanel extends JPanel implements Runnable{
 		this.setDoubleBuffered(true); // Enables double buffering for smoother rendering
 		this.addKeyListener(keyH); // Adds the KeyHandler for listening to key presses
 		this.setFocusable(true); // Allows the panel to receive keyboard input
+	
 	}
 	// Starts the game thread
 	public void startGameThread() {
@@ -64,6 +83,7 @@ public class GamePanel extends JPanel implements Runnable{
 		while(gameThread != null) { // Loops continuously until the game thread is stopped
 		update(); // Updates game elements
 		repaint();// Repaints the screen to reflect changes
+		
 		// Controls frame rate
 		try {
 			double remainingTime = nextDrawTime - System.nanoTime();
@@ -82,14 +102,21 @@ public class GamePanel extends JPanel implements Runnable{
 	// Updates game elements (currently only updates the player)
 	public void update() {
 		player.update();
-	
+
 	}
 	// Draws game elements on the screen
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g); // Calls the parent class's paintComponent method
-		Graphics2D g2 = (Graphics2D)g; // Casts Graphics object to Graphics2D for advanced features
+		Graphics2D g2 = (Graphics2D)g; // Casts Graphics object to Graphics2D for advanced features	
+	
+		//Title Screen, holds the other screens 
+		if(gameState == titleState) {
+			mainMenu.draw(g2);
+		
+		}else if(gameState == playState){
 		tileM.draw(g2); //Draws map tile
 		player.draw(g2); // Draws the player on the screen
 		g2.dispose(); // Disposes of graphics resources
+		}
 	}
 }
