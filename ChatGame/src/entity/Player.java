@@ -219,7 +219,6 @@ public class Player extends Entity implements Runnable{
 				//ipAddress = ip;
 				ipAddress = InetAddress.getByName("localhost");
 				readBuffer = new byte[1400];
-				bufLen = readBuffer.length;
 			} catch(Exception e) {
 				//something
 			}
@@ -227,13 +226,12 @@ public class Player extends Entity implements Runnable{
 		public void run() {
 			while(true) {
 				try {
-					readPacket = new DatagramPacket(readBuffer, bufLen);//hopefully pulls in the correct length
+					readPacket = new DatagramPacket(readBuffer, readBuffer.length);//hopefully pulls in the correct length
 					readSocket.receive(readPacket);
-					bufLen = readPacket.getLength();
 					byteInput = new ByteArrayInputStream(readBuffer);
 					in = new ObjectInputStream(byteInput);
 					readPlayerInfo = (ClientToServer)in.readObject();
-					System.out.println("PID: " + readPlayerInfo.getPID() + ", X: " + readPlayerInfo.getX() + ", Y: " + readPlayerInfo.getY());
+					//System.out.println("PID: " + readPlayerInfo.getPID() + ", X: " + readPlayerInfo.getX() + ", Y: " + readPlayerInfo.getY());
 					//THE WRITE BUFFER IS BROKEN BECAUSE BOTH PLAYERS ONLY RECEIVE 1 PID
 					assignInfo();
 					Thread.sleep(25);
@@ -291,14 +289,14 @@ public class Player extends Entity implements Runnable{
 				try {
 					infoObject.setX(getX());
 					infoObject.setY(getY());
-					//System.out.println("Sending: PID: " + infoObject.getPID() + ", X: " + infoObject.getX() + ", Y: " + infoObject.getY());
+					System.out.println("Sending: PID: " + infoObject.getPID() + ", X: " + infoObject.getX() + ", Y: " + infoObject.getY());
 					//WE SEND CORRECT INFO BUT RECEIVED INFO IS STUCK AT X:100 Y:100
 					out.writeObject(infoObject);
+					//System.out.println("Player Sending " +buffer.toByteArray().length + " bytes");
 					sPacket = new DatagramPacket(buffer.toByteArray(), buffer.size(), address, 5252);
 					writeSocket.send(sPacket);
 					//System.out.println("Just sent a packet to:" + address);
 					out.flush();
-					buffer.flush();//guessing we'll need to do it
 					Thread.sleep(25);
 				} catch(Exception e) {
 					//something
@@ -368,7 +366,7 @@ public class Player extends Entity implements Runnable{
 					dataOut.flush();
 					Thread.sleep(25);
 				}catch(Exception e){
-					//you can catch my balls
+					//something
 				}
 			}
 		}
