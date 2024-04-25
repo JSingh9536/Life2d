@@ -217,7 +217,7 @@ public class Player extends Entity implements Runnable{
 			try {
 				readSocket = new DatagramSocket(6262);
 				//ipAddress = ip;
-				ipAddress = InetAddress.getByName("localhost");
+				ipAddress = InetAddress.getByName("25.5.96.33");
 				readBuffer = new byte[1400];
 			} catch(Exception e) {
 				//something
@@ -274,7 +274,7 @@ public class Player extends Entity implements Runnable{
 			try {
 				writeSocket = new DatagramSocket();
 				//address = ip;
-				address = InetAddress.getByName("localhost");
+				address = InetAddress.getByName("25.5.96.33");
 				infoObject = new ClientToServer(playerID, getX(), getY());
 				buffer = new ByteArrayOutputStream();
 				out = new ObjectOutputStream(buffer);

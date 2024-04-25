@@ -5,16 +5,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
-//<<<<<<< HEAD
 import javax.swing.JButton;
-//=======
 import javax.swing.JOptionPane;
-//>>>>>>> branch 'main' of https://github.com/JSingh9536/Life2d.git
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-
 import entity.Player;
 //Defines a class(for visual components)
 //and implements Runnable (for game loop functionality)
