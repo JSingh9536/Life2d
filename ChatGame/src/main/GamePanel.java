@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,7 +29,7 @@ public class GamePanel extends JPanel implements Runnable{
 	//Determines pixel size and screen size
 	final int originalTitleSize = 16;
 	final int scale = 3;
-	private JTextField uName;
+	private String uName;
 
 	public final int tileSize = originalTitleSize * scale;
 	public final int maxScreenCol = 16;
@@ -34,6 +37,11 @@ public class GamePanel extends JPanel implements Runnable{
 	public final int screenWidth = tileSize * maxScreenCol;
 	public final int screenHeight = tileSize * maxScreenRow;
 	
+	//map settings
+	public final int maxWorldCol = 50;
+	public final int maxWorldRow = 50;
+	public final int worldWidth = tileSize * maxWorldCol;
+	public final int worldHeight = tileSize * maxWorldRow;
 	//game States
 	public final int titleState = 0;
 	public int gameState = 0;
@@ -44,25 +52,26 @@ public class GamePanel extends JPanel implements Runnable{
 
 	//object for Main menu screen
  	MainMenu mainMenu = new MainMenu(this);
-
-	
  	TileManager tileM = new TileManager(this);
 	// KeyHandler object for handling user input
 	KeyHandler keyH = new KeyHandler(this, mainMenu);
-	
 	// Thread for running the game loop
 	Thread gameThread;
+	public CChecker CChecker = new CChecker(this);
 	// Player object
-	Player player = new Player(this, keyH);
+	public Player player = new Player(this, keyH);
+	
+ 
 	// Initializes the GamePanel object with appropriate settings
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-		this.setBackground(Color.black);
+		this.setBackground(Color.BLACK);
 		this.setDoubleBuffered(true); // Enables double buffering for smoother rendering
 		this.addKeyListener(keyH); // Adds the KeyHandler for listening to key presses
 		this.setFocusable(true); // Allows the panel to receive keyboard input
-	
-	}
+		
+    }
+
 	// Starts the game thread
 	public void startGameThread() {
 		gameThread = new Thread(this); // Creates a thread using this GamePanel object

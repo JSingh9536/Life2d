@@ -2,6 +2,7 @@ package entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,10 +31,18 @@ public class Player extends Entity implements Runnable{
 	private int playerID;
 	public ArrayList<ClientToServer> otherPlayerInfo;
 
+	//camera
+	public final int screenX;
+	public final int screenY;
 	// Initializes a Player object with references to a GamePanel and KeyHandler	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		this.gp = gp;
 		this.keyH = keyH;
+		screenX = gp.screenWidth/2 - (gp.tileSize/2);  //returns center of the screen
+		screenY = gp.screenHeight/2 - (gp.tileSize/2);
+		colider = new Rectangle(10,16,32,32);
+	
+		
 		setDefaultValue(); // Sets default values for player attributes
 		getPlayerImage(); // Loads player sprites
 		run();
@@ -72,41 +81,64 @@ public class Player extends Entity implements Runnable{
 	// Updates the player's position and animation based on key presses
 
 	public void update() {
-		if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {
-		if(keyH.upPressed == true) {
-			direction = "up";
-			worldY -= speed;
-			
-		}
-		else if(keyH.downPressed == true) {
-			direction = "down";
-			worldY += speed;
-		}
-		else if(keyH.leftPressed == true) {
-			direction = "left";
-			worldX -= speed;
-		}
-		else if(keyH.rightPressed == true) {
-			direction = "right";
-			worldX += speed;
-		}
-        // Updates animation frame
+	    boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
+	    
+	    if (isMoving) {
+	        if (keyH.upPressed) {
+	            direction = "up";
+	        } else if (keyH.downPressed) {
+	            direction = "down";
+	        } else if (keyH.leftPressed) {
+	            direction = "left";
+	        } else if (keyH.rightPressed) {
+	            direction = "right";
+	        }
 
-		spriteCounter++;
-		if(spriteCounter > 12) {
-			if(spriteNum == 1 ) {
-				spriteNum = 2;
-			}
-			else if (spriteNum == 2) {
-				spriteNum = 1;
-			}
-			spriteCounter = 0;
-		}
-		
-	
-	}
-	}
-	// Draws the player's sprite image on the screen
+	        // Collision check
+	        collisionOn = false;
+	        gp.CChecker.checkTile(this);
+
+	        // Update position only if there's no collision
+	        if (!collisionOn) {
+	            switch (direction) {
+	                case "up":
+	                    if (worldY - speed >= 0) { // Ensure not moving out of bounds
+	                        worldY -= speed;
+	                    }
+	                    break;
+	                case "down":
+	                    if (worldY + speed + colider.height <= gp.maxWorldRow * gp.tileSize) { // Ensure not moving out of bounds
+	                        worldY += speed;
+	                    }
+	                    break;
+	                case "left":
+	                    if (worldX - speed >= 0) { // Ensure not moving out of bounds
+	                        worldX -= speed;
+	                    }
+	                    break;
+	                case "right":
+	                    if (worldX + speed + colider.width <= gp.maxWorldCol * gp.tileSize) { // Ensure not moving out of bounds
+	                        worldX += speed;
+	                    }
+	                    break;
+	            }
+	        }
+	        
+	        // Updates animation frame
+	        spriteCounter++;
+	        if (spriteCounter > 12) {
+	            if (spriteNum == 1) {
+	                spriteNum = 2;
+	            } else if (spriteNum == 2) {
+	                spriteNum = 1;
+	            }
+	            spriteCounter = 0;
+	        }
+	    } else {
+	        // Reset spriteCounter when not moving to prevent animation
+	        spriteCounter = 0;
+	    }
+	}	// Draws the player's sprite image on the screen
 	public void draw(Graphics2D g2) {
 		BufferedImage image = null;
 		switch(direction) {     // Selects the appropriate sprite image based on direction and animation frame
@@ -159,7 +191,7 @@ public class Player extends Entity implements Runnable{
 	    // Draws the selected image at the player's current position
 	    // using tileSize as a guide for dimensions
 
-		g2.drawImage(image, worldX, worldY, gp.tileSize, gp.tileSize, null);
+		g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
 
 	
 		
