@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -8,7 +9,9 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -60,7 +63,10 @@ public class GamePanel extends JPanel implements Runnable{
 	public CChecker CChecker = new CChecker(this);
 	// Player object
 	public Player player = new Player(this, keyH);
-	
+	Chatbox chatbox = new Chatbox();
+	TextFrame TextFrame = new TextFrame(this);
+
+
  
 	// Initializes the GamePanel object with appropriate settings
 	public GamePanel() {
@@ -69,8 +75,10 @@ public class GamePanel extends JPanel implements Runnable{
 		this.setDoubleBuffered(true); // Enables double buffering for smoother rendering
 		this.addKeyListener(keyH); // Adds the KeyHandler for listening to key presses
 		this.setFocusable(true); // Allows the panel to receive keyboard input
-		
-    }
+		TextFrame.draw();
+		 chatbox.setVisible(true);
+
+	    }
 
 	// Starts the game thread
 	public void startGameThread() {

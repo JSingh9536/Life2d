@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 
 import javax.swing.JButton;
@@ -24,10 +25,8 @@ public class Main {
 		window.setLocationRelativeTo(null); // Centers the window on the screen
 		window.setVisible(true); // Makes the window visible
 	
-		MainMenu mainMenu = new MainMenu(GamePanel);
-		TextFrame TextFrame = new TextFrame(GamePanel);
-		TextFrame.draw();
 		
+
 		 // Starts the game thread, initiating the game loop
 		GamePanel.startGameThread();
 
