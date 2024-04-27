@@ -1,4 +1,5 @@
 package entity;
+import java.awt.Rectangle;
 //Imports the BufferedImage class for handling images
 import java.awt.image.BufferedImage;
 //Defines a class named Entity that serves as a base class for representing objects in a game
@@ -12,6 +13,10 @@ public class Entity {
 	// Variables for managing animation frames
 	public int spriteCounter = 0;
 	public int spriteNum = 1; // Specifies the current animation frame
+	
+	public Rectangle colider;
+	public boolean collisionOn = false;
+	
 	public int playerID;
 	
 	//~~~~~~~~~~~~Changes:

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
 
 public class Chatbox extends JFrame implements ActionListener {
 
@@ -38,6 +39,7 @@ public class Chatbox extends JFrame implements ActionListener {
 
         // Add chat window
         chatWindow = new TextArea();
+        chatWindow.setBackground(Color.BLACK);
         chatWindow.setEditable(false);
         chatPanel.add(chatWindow, BorderLayout.CENTER);
 
