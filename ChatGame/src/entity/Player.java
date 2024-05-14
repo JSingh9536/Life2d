@@ -205,8 +205,8 @@ public class Player extends Entity implements Runnable{
 	}
 	
 	public void run() {
-		//connectToServerTCP("localhost");
-		connectToServerUDP();
+		connectToServerTCP("localhost");
+		//connectToServerUDP();
 	}
 	//TCP Version:
 	private void connectToServerTCP(String ip) { //used to have 'name' arg; might implement later
@@ -224,7 +224,7 @@ public class Player extends Entity implements Runnable{
 				//shutdown
 			}
 	}
-	//UDP Version
+	/*UDP Version
 	private void connectToServerUDP() {//used to have arg InetAddress serverIP
 		playerID = (int)(Math.random()* 1000) + 111;
 		ReadFromServerHandlerUDP rfsU = new ReadFromServerHandlerUDP(); //had serverIP arg
@@ -338,7 +338,7 @@ public class Player extends Entity implements Runnable{
 			//out.close(); close these two somewhere
 			//buffer.close();
 		}
-	}
+	}*/
 	//TCP VERSIONS:
 	private class ReadFromServerHandler implements Runnable{
 		public DataInputStream dataIn;
@@ -385,18 +385,25 @@ public class Player extends Entity implements Runnable{
 	}
 	private class WriteToServerHandler implements Runnable{
 		DataOutputStream dataOut;
+		private int checkX;
+		private int checkY;
 		
 		public WriteToServerHandler(DataOutputStream out) {
 			dataOut = out;
 		}
 		
 		public void run() {
-			while(true) {
+			while(true) {//below: only send packets if we move
 				try {
-					dataOut.writeInt(getX());
-					dataOut.writeInt(getY());
-					dataOut.flush();
-					Thread.sleep(25);
+					if((checkX != getX()) || (checkY != getY())) {
+						checkX = getX();
+						checkY = getY();
+						dataOut.writeInt(getX());
+						dataOut.writeInt(getY());
+						System.out.println("Sent a packet!");
+						dataOut.flush();
+						Thread.sleep(25);
+					}
 				}catch(Exception e){
 					//something
 				}

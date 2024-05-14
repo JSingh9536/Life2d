@@ -35,8 +35,8 @@ public class GameServer implements Runnable{
 	}
 	
 	public void run() {
-		//tcpServer();
-		udpServer();
+		tcpServer();
+		//udpServer();
 	}
 	
 	public void udpServer() {
