@@ -395,12 +395,14 @@ public class Player extends Entity implements Runnable{
 		public void run() {
 			while(true) {//below: only send packets if we move
 				try {
-					if((checkX != getX()) || (checkY != getY())) {
+					//***I HAVE NO IDEA WHY BUT CODE WILL NOT SEND PACKETS UNLESS THIS PRINT STMENT IS HERE***
+					System.out.println("CurrentX: " + getX() + ", previous: " + checkX);//***YES...THIS ONE...***
+					if(checkX != getX() || checkY != getY()) {
 						checkX = getX();
 						checkY = getY();
+						System.out.println("Sent a packet! and we're moving!");
 						dataOut.writeInt(getX());
 						dataOut.writeInt(getY());
-						System.out.println("Sent a packet!");
 						dataOut.flush();
 						Thread.sleep(25);
 					}
