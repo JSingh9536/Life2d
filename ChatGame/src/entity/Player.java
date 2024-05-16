@@ -16,6 +16,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -25,6 +26,7 @@ import main.KeyHandler;
 public class Player extends Entity implements Runnable{
 	GamePanel gp;
 	KeyHandler keyH;
+	String message;
 	
 	//Vars for Network-Connection
 	private Socket client;
@@ -54,6 +56,92 @@ public class Player extends Entity implements Runnable{
 		speed = 4; // Player's movement speed
 		direction = "down"; // Initial facing direction
 		
+	}
+	public String Chat(String text) {
+		if (keyH.upPressed) {
+            text += "w";
+            return text;
+        }else if (keyH.downPressed) {
+            text += "s";
+            return text;
+        }else if (keyH.leftPressed) {
+            text += "a";
+            return text;
+        }else if (keyH.rightPressed) {
+            text += "d";
+            return text;
+        }else if (keyH.QPressed) {
+            text += "q";
+            return text;
+        }else if (keyH.EPressed) {
+            text += "e";
+            return text;
+        }else if (keyH.RPressed) {
+            text += "r";
+            return text;
+        }else if (keyH.TPressed) {
+            text += "t";
+            return text;
+        }else if (keyH.YPressed) {
+            text += "y";
+            return text;
+        }else if (keyH.UPressed) {
+            text += "u";
+            return text;
+        }else if (keyH.IPressed) {
+            text += "i";
+            return text;
+        }else if (keyH.OPressed) {
+            text += "o";
+            return text;
+        }else if (keyH.PPressed) {
+            text += "p";
+            return text;
+        }else if (keyH.FPressed) {
+            text += "f";
+            return text;
+        }else if (keyH.GPressed) {
+            text += "g";
+            return text;
+        }else if (keyH.HPressed) {
+            text += "h";
+            return text;
+        }else if (keyH.JPressed) {
+            text += "j";
+            return text;
+        }else if (keyH.KPressed) {
+            text += "k";
+            return text;
+        }else if (keyH.LPressed) {
+            text += "l";
+            return text;
+        }else if (keyH.ZPressed) {
+            text += "z";
+            return text;
+        }else if (keyH.XPressed) {
+            text += "x";
+            return text;
+        }else if (keyH.CPressed) {
+            text += "c";
+            return text;
+        }else if (keyH.VPressed) {
+            text += "v";
+            return text;
+        }else if (keyH.BPressed) {
+            text += "b";
+            return text;
+        }else if (keyH.NPressed) {
+            text += "n";
+            return text;
+        }else if (keyH.MPressed) {
+            text += "m";
+            return text;
+        }else if (keyH.spacePressed) {
+            text += " ";
+            return text;
+        }else {
+        	return text;
+        }
 	}
 	// Loads player sprite images from files
 	public void getPlayerImage() {
