@@ -43,9 +43,6 @@ public class Player extends Entity implements Runnable{
 		screenX = gp.screenWidth/2 - (gp.tileSize/2);  //returns center of the screen
 		screenY = gp.screenHeight/2 - (gp.tileSize/2);
 		colider = new Rectangle(10,16,32,32);
-		ChatClient c = new ChatClient();
-		Thread cThread = new Thread(c);
-		cThread.start();	
 	
 		
 		setDefaultValue(); // Sets default values for player attributes
@@ -88,6 +85,15 @@ public class Player extends Entity implements Runnable{
 
 	public void update() {
 	    boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
+	    
+	    if(keyH.slashPressed) {
+			System.out.println("Now typing!");
+	    	message = "";
+	    	while(!keyH.enterPressed) {
+	    		Chat();
+	    	}
+	    	System.out.println(message);
+	    }
 	    
 	    if (isMoving) {
 	        if (keyH.upPressed) {
@@ -145,6 +151,63 @@ public class Player extends Entity implements Runnable{
 	        spriteCounter = 0;
 	    }
 	}	// Draws the player's sprite image on the screen
+	public void Chat() {
+		if (keyH.upPressed) {
+            message += "w";
+        }else if (keyH.downPressed) {
+        	message += "s";
+        }else if (keyH.leftPressed) {
+        	message += "a";
+        }else if (keyH.rightPressed) {
+        	message += "d";
+        }else if (keyH.QPressed) {
+        	message += "q";
+        }else if (keyH.EPressed) {
+        	message += "e";
+        }else if (keyH.RPressed) {
+        	message += "r";
+        }else if (keyH.TPressed) {
+        	message += "t";
+        }else if (keyH.YPressed) {
+        	message += "y";
+        }else if (keyH.UPressed) {
+        	message += "u";
+        }else if (keyH.IPressed) {
+        	message += "i";
+        }else if (keyH.OPressed) {
+        	message += "o";
+        }else if (keyH.PPressed) {
+        	message += "p";
+        }else if (keyH.FPressed) {
+        	message += "f";
+        }else if (keyH.GPressed) {
+        	message += "g";
+        }else if (keyH.HPressed) {
+        	message += "h";
+        }else if (keyH.JPressed) {
+        	message += "j";
+        }else if (keyH.KPressed) {
+        	message += "k";
+        }else if (keyH.LPressed) {
+        	message += "l";
+        }else if (keyH.ZPressed) {
+        	message += "z";
+        }else if (keyH.XPressed) {
+        	message += "x";
+        }else if (keyH.CPressed) {
+        	message += "c";
+        }else if (keyH.VPressed) {
+        	message += "v";
+        }else if (keyH.BPressed) {
+            message += "b";
+        }else if (keyH.NPressed) {
+            message += "n";
+        }else if (keyH.MPressed) {
+            message += "m";
+        }else if (keyH.spacePressed) {
+            message += " ";
+        }
+	}
 	public void draw(Graphics2D g2) {
 		BufferedImage image = null;
 		switch(direction) {     // Selects the appropriate sprite image based on direction and animation frame
@@ -213,84 +276,6 @@ public class Player extends Entity implements Runnable{
 	public void run() {
 		connectToServerTCP("localhost");
 		//connectToServerUDP();
-	}
-	private class ChatClient implements Runnable{
-		
-		
-		public ChatClient() {
-			
-		}
-		public void run() {
-			while(true) {
-				System.out.println("test");
-				if(keyH.slashPressed) {
-					System.out.println("Now typing!");
-			    	message = "";
-			    	while(!keyH.enterPressed) {
-			    		Chat();
-			    	}
-			    	System.out.println(message);
-			    }
-			}
-		}
-		public void Chat() {
-			if (keyH.upPressed) {
-	            message += "w";
-	        }else if (keyH.downPressed) {
-	        	message += "s";
-	        }else if (keyH.leftPressed) {
-	        	message += "a";
-	        }else if (keyH.rightPressed) {
-	        	message += "d";
-	        }else if (keyH.QPressed) {
-	        	message += "q";
-	        }else if (keyH.EPressed) {
-	        	message += "e";
-	        }else if (keyH.RPressed) {
-	        	message += "r";
-	        }else if (keyH.TPressed) {
-	        	message += "t";
-	        }else if (keyH.YPressed) {
-	        	message += "y";
-	        }else if (keyH.UPressed) {
-	        	message += "u";
-	        }else if (keyH.IPressed) {
-	        	message += "i";
-	        }else if (keyH.OPressed) {
-	        	message += "o";
-	        }else if (keyH.PPressed) {
-	        	message += "p";
-	        }else if (keyH.FPressed) {
-	        	message += "f";
-	        }else if (keyH.GPressed) {
-	        	message += "g";
-	        }else if (keyH.HPressed) {
-	        	message += "h";
-	        }else if (keyH.JPressed) {
-	        	message += "j";
-	        }else if (keyH.KPressed) {
-	        	message += "k";
-	        }else if (keyH.LPressed) {
-	        	message += "l";
-	        }else if (keyH.ZPressed) {
-	        	message += "z";
-	        }else if (keyH.XPressed) {
-	        	message += "x";
-	        }else if (keyH.CPressed) {
-	        	message += "c";
-	        }else if (keyH.VPressed) {
-	        	message += "v";
-	        }else if (keyH.BPressed) {
-	            message += "b";
-	        }else if (keyH.NPressed) {
-	            message += "n";
-	        }else if (keyH.MPressed) {
-	            message += "m";
-	        }else if (keyH.spacePressed) {
-	            message += " ";
-	        }
-		}
-		
 	}
 	//TCP Version:
 	private void connectToServerTCP(String ip) { //used to have 'name' arg; might implement later
