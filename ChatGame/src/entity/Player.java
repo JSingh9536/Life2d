@@ -26,7 +26,7 @@ import main.KeyHandler;
 public class Player extends Entity implements Runnable{
 	GamePanel gp;
 	KeyHandler keyH;
-	String message;
+	public String message;
 	
 	//Vars for Network-Connection
 	private Socket client;
@@ -43,6 +43,9 @@ public class Player extends Entity implements Runnable{
 		screenX = gp.screenWidth/2 - (gp.tileSize/2);  //returns center of the screen
 		screenY = gp.screenHeight/2 - (gp.tileSize/2);
 		colider = new Rectangle(10,16,32,32);
+		ChatClient c = new ChatClient();
+		Thread cThread = new Thread(c);
+		cThread.start();	
 	
 		
 		setDefaultValue(); // Sets default values for player attributes
@@ -57,92 +60,7 @@ public class Player extends Entity implements Runnable{
 		direction = "down"; // Initial facing direction
 		
 	}
-	public String Chat(String text) {
-		if (keyH.upPressed) {
-            text += "w";
-            return text;
-        }else if (keyH.downPressed) {
-            text += "s";
-            return text;
-        }else if (keyH.leftPressed) {
-            text += "a";
-            return text;
-        }else if (keyH.rightPressed) {
-            text += "d";
-            return text;
-        }else if (keyH.QPressed) {
-            text += "q";
-            return text;
-        }else if (keyH.EPressed) {
-            text += "e";
-            return text;
-        }else if (keyH.RPressed) {
-            text += "r";
-            return text;
-        }else if (keyH.TPressed) {
-            text += "t";
-            return text;
-        }else if (keyH.YPressed) {
-            text += "y";
-            return text;
-        }else if (keyH.UPressed) {
-            text += "u";
-            return text;
-        }else if (keyH.IPressed) {
-            text += "i";
-            return text;
-        }else if (keyH.OPressed) {
-            text += "o";
-            return text;
-        }else if (keyH.PPressed) {
-            text += "p";
-            return text;
-        }else if (keyH.FPressed) {
-            text += "f";
-            return text;
-        }else if (keyH.GPressed) {
-            text += "g";
-            return text;
-        }else if (keyH.HPressed) {
-            text += "h";
-            return text;
-        }else if (keyH.JPressed) {
-            text += "j";
-            return text;
-        }else if (keyH.KPressed) {
-            text += "k";
-            return text;
-        }else if (keyH.LPressed) {
-            text += "l";
-            return text;
-        }else if (keyH.ZPressed) {
-            text += "z";
-            return text;
-        }else if (keyH.XPressed) {
-            text += "x";
-            return text;
-        }else if (keyH.CPressed) {
-            text += "c";
-            return text;
-        }else if (keyH.VPressed) {
-            text += "v";
-            return text;
-        }else if (keyH.BPressed) {
-            text += "b";
-            return text;
-        }else if (keyH.NPressed) {
-            text += "n";
-            return text;
-        }else if (keyH.MPressed) {
-            text += "m";
-            return text;
-        }else if (keyH.spacePressed) {
-            text += " ";
-            return text;
-        }else {
-        	return text;
-        }
-	}
+	
 	// Loads player sprite images from files
 	public void getPlayerImage() {
 		try {
@@ -170,14 +88,6 @@ public class Player extends Entity implements Runnable{
 
 	public void update() {
 	    boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
-	    
-	    if(keyH.slashPressed) {
-	    	message = "";
-	    	while(!keyH.enterPressed) {
-	    		message += Chat(message);
-	    	}
-	    	System.out.println(message);
-	    }
 	    
 	    if (isMoving) {
 	        if (keyH.upPressed) {
@@ -303,6 +213,84 @@ public class Player extends Entity implements Runnable{
 	public void run() {
 		connectToServerTCP("localhost");
 		//connectToServerUDP();
+	}
+	private class ChatClient implements Runnable{
+		
+		
+		public ChatClient() {
+			
+		}
+		public void run() {
+			while(true) {
+				System.out.println("test");
+				if(keyH.slashPressed) {
+					System.out.println("Now typing!");
+			    	message = "";
+			    	while(!keyH.enterPressed) {
+			    		Chat();
+			    	}
+			    	System.out.println(message);
+			    }
+			}
+		}
+		public void Chat() {
+			if (keyH.upPressed) {
+	            message += "w";
+	        }else if (keyH.downPressed) {
+	        	message += "s";
+	        }else if (keyH.leftPressed) {
+	        	message += "a";
+	        }else if (keyH.rightPressed) {
+	        	message += "d";
+	        }else if (keyH.QPressed) {
+	        	message += "q";
+	        }else if (keyH.EPressed) {
+	        	message += "e";
+	        }else if (keyH.RPressed) {
+	        	message += "r";
+	        }else if (keyH.TPressed) {
+	        	message += "t";
+	        }else if (keyH.YPressed) {
+	        	message += "y";
+	        }else if (keyH.UPressed) {
+	        	message += "u";
+	        }else if (keyH.IPressed) {
+	        	message += "i";
+	        }else if (keyH.OPressed) {
+	        	message += "o";
+	        }else if (keyH.PPressed) {
+	        	message += "p";
+	        }else if (keyH.FPressed) {
+	        	message += "f";
+	        }else if (keyH.GPressed) {
+	        	message += "g";
+	        }else if (keyH.HPressed) {
+	        	message += "h";
+	        }else if (keyH.JPressed) {
+	        	message += "j";
+	        }else if (keyH.KPressed) {
+	        	message += "k";
+	        }else if (keyH.LPressed) {
+	        	message += "l";
+	        }else if (keyH.ZPressed) {
+	        	message += "z";
+	        }else if (keyH.XPressed) {
+	        	message += "x";
+	        }else if (keyH.CPressed) {
+	        	message += "c";
+	        }else if (keyH.VPressed) {
+	        	message += "v";
+	        }else if (keyH.BPressed) {
+	            message += "b";
+	        }else if (keyH.NPressed) {
+	            message += "n";
+	        }else if (keyH.MPressed) {
+	            message += "m";
+	        }else if (keyH.spacePressed) {
+	            message += " ";
+	        }
+		}
+		
 	}
 	//TCP Version:
 	private void connectToServerTCP(String ip) { //used to have 'name' arg; might implement later
