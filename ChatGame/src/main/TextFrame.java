@@ -7,6 +7,9 @@ import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+
+import Database.Database;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JPasswordField;
@@ -29,8 +32,11 @@ public class TextFrame {
 	private JLabel lblNewLabel_2;
 	private JTextField taIPAddress;
 	private JLabel lblIP;
+	private JLabel lblE;
+	private JTextField emailInput; 
 	
-	public String username;
+	public static String username = "help";
+	public static String email = "help";
 	public String ipAddress;
 	
 	GamePanel gp;
@@ -78,9 +84,15 @@ public class TextFrame {
 			public void actionPerformed(ActionEvent e) {
 				
 				username = tfUsernameName.getText();
+				
 				ipAddress = taIPAddress.getText();
-				OUTPUT.setText( ipAddress+ "\n" + username);
+				email =emailInput.getText();
+				OUTPUT.setText("Email: "+ email+ "\n"+ "IP Address: "+ipAddress+ "\n" + "Username:" + username );
 				gp.gameState = gp.playState;
+				Database Database = new Database();
+				Database.IDValue();
+				Database.Data();
+				Database.DataReadOut();
 			//	frame.setVisible(false);
 			}
 		});
@@ -100,34 +112,10 @@ public class TextFrame {
 		OUTPUT.setBounds(49, 129, 323, 45);
 		frame.getContentPane().add(OUTPUT);
 		
-	//	ImageIcon smile = new ImageIcon("smile.png");
-		
-	//	image = new JLabel("");
-	//	Image img = new ImageIcon(this.getClass().getResource("/smiles.png")).getImage();
-		//image.setIcon(new ImageIcon(img));
-		//image.setBounds(178, 61, 200, 127);
-		//frame.getContentPane().add(image);
-		
-		
-	//	spriteImg = new JLabel("");
-		//Image spriteImage = new ImageIcon(this.getClass().getResource("/SpritePhoto.png")).getImage();
-	//	spriteImg.setIcon(new ImageIcon(spriteImage));
-		//spriteImg.setBounds(455, 47, 109, 161);
-	//	frame.getContentPane().add(spriteImg);
-		
-	//	lblNewLabel_1 = new JLabel("Sprite:");
-	//	lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-	//	lblNewLabel_1.setBounds(477, 11, 78, 25);
-	//	frame.getContentPane().add(lblNewLabel_1);
-		
 		lblNewLabel_2 = new JLabel("Life2D");
 		lblNewLabel_2.setFont(new Font("Yu Gothic UI Semibold", Font.BOLD, 30));
 		lblNewLabel_2.setBounds(161, 11, 89, 39);
 		frame.getContentPane().add(lblNewLabel_2);
-		
-	//	JTextArea textArea_1 = new JTextArea();
-	//	textArea_1.setBounds(31, 135, 89, 22);
-	//	frame.getContentPane().add(textArea_1);
 	
 		taIPAddress = new JTextField();
 		taIPAddress.setBounds(92, 72, 220, 19);
@@ -138,6 +126,14 @@ public class TextFrame {
 		lblIP.setBounds(24, 72, 65, 14);
 		frame.getContentPane().add(lblIP);
 		
+		lblE = new JLabel("Email :");
+		lblE.setBounds(24, 50, 65, 14);
+		frame.getContentPane().add(lblE);
+		
+		emailInput = new JTextField();
+		emailInput.setBounds(92,50, 220, 19);
+		frame.getContentPane().add(	emailInput);
+		emailInput.setColumns(10);
 
 	}
 }
