@@ -171,6 +171,14 @@ public class Player extends Entity implements Runnable{
 	public void update() {
 	    boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
 	    
+	    if(keyH.slashPressed) {
+	    	message = "";
+	    	while(!keyH.enterPressed) {
+	    		message += Chat(message);
+	    	}
+	    	System.out.println(message);
+	    }
+	    
 	    if (isMoving) {
 	        if (keyH.upPressed) {
 	            direction = "up";
